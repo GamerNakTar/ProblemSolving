@@ -6,25 +6,69 @@ internal static class Program
 {
     static void Main()
     {
-        var input = Console.ReadLine();
-        var groups = input.Split('-');
-        var result = 0;
+        var N = int.Parse(Console.ReadLine());
+        var map = new int[N, N];
+        var visited = new bool[N, N];
+        int[] dx = { 0, 0, 1, -1 };
+        int[] dy = { 1, -1, 0, 0 };
 
-        for (var i = 0; i < groups.Length; i++)
+        for (var i = 0; i < N; i++)
         {
-            var numbers = groups[i].Split('+');
-            var currentSum = numbers.Sum(int.Parse);
-
-            if (i == 0)
+            var line = Console.ReadLine();
+            for (var j = 0; j < N; j++)
             {
-                result += currentSum;
-            }
-            else
-            {
-                result -= currentSum;
+                map[i, j] = line[j] - '0';
             }
         }
 
-        Console.WriteLine(result);
+        var complexCounts = new List<int>();
+
+        for (var i = 0; i < N; i++)
+        {
+            for (var j = 0; j < N; j++)
+            {
+                if (map[i, j] == 1 && !visited[i, j])
+                {
+                    complexCounts.Add(Bfs(i, j));
+                }
+            }
+        }
+
+        complexCounts.Sort();
+        Console.WriteLine(complexCounts.Count);
+        foreach (var count in complexCounts)
+        {
+            Console.WriteLine(count);
+        }
+
+        return;
+
+        int Bfs(int x, int y)
+        {
+            var queue = new Queue<(int, int)>();
+            queue.Enqueue((x, y));
+            visited[x, y] = true;
+            var count = 0;
+
+            while (queue.Count > 0)
+            {
+                var curr = queue.Dequeue();
+                count++;
+
+                for (var i = 0; i < 4; i++)
+                {
+                    var nx = curr.Item1 + dx[i];
+                    var ny = curr.Item2 + dy[i];
+
+                    if (nx < 0 || nx >= N || ny < 0 || ny >= N) continue;
+                    if (map[nx, ny] != 1 || visited[nx, ny]) continue;
+
+                    visited[nx, ny] = true;
+                    queue.Enqueue((nx, ny));
+                }
+            }
+
+            return count;
+        }
     }
 }
